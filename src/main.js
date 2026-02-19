@@ -1,17 +1,10 @@
-import CreationFormView from './view/creation-form-view';
 import ListFilterView from './view/list-filter-view';
-import ListSortView from './view/list-sort-view';
-import PointView from './view/point-view';
-import RedactionFormView from './view/redaction-form-view';
 import {render} from './render';
+import PointsPresenter from './presenter/points-presenter.js';
 
 const filterContainer = document.querySelector('.trip-controls__filters');
 const tripContainer = document.querySelector('.trip-events');
+const pointsPresenter = new PointsPresenter({pointsContainer: tripContainer});
 
 render(new ListFilterView(), filterContainer);
-render(new ListSortView(), tripContainer);
-render(new RedactionFormView(), tripContainer);
-render(new PointView(), tripContainer);
-render(new PointView(), tripContainer);
-render(new PointView(), tripContainer);
-render(new CreationFormView(), tripContainer);
+pointsPresenter.init();
