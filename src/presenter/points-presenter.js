@@ -8,17 +8,20 @@ import {render} from '../render';
 export default class PointsPresenter {
   pointsComponent = new PointsListView();
 
-  constructor({pointsContainer}) {
+  constructor({pointsContainer, pointsModel}) {
     this.pointsContainer = pointsContainer;
+    this.pointsModel = pointsModel;
   }
 
   init() {
+    this.pointsModels = [...this.pointsModel.getPoints()];
+
     render(new ListSortView(), this.pointsContainer);
     render(this.pointsComponent, this.pointsContainer);
     render(new RedactionFormView(), this.pointsComponent.getElement());
 
-    for (let i = 0; i < 3; i++) {
-      render(new PointView(), this.pointsComponent.getElement());
+    for (let i = 0; i < this.pointsModels.length; i++) {
+      render(new PointView({task: this.pointsModels[i]}), this.pointsComponent.getElement());
     }
 
     render(new CreationFormView(), this.pointsComponent.getElement());
