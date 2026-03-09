@@ -4,7 +4,7 @@ import ListSortView from '../view/list-sort-view';
 import PointView from '../view/point-view';
 import RedactionFormView from '../view/redaction-form-view';
 import PointsContainerView from '../view/points-container-view';
-import {render} from '../render';
+import {render} from '../framework/render';
 
 export default class PointsPresenter {
   pointsComponent = new PointsContainerView();
@@ -36,7 +36,7 @@ export default class PointsPresenter {
       offersByType: this.offersModel.getOffersByType(this.pointsModels[0].type),
       destination: this.destinationModel.getDestinationById(this.pointsModels[0].destination)
     });
-    render(redactionForm, this.pointsComponent.getElement());
+    render(redactionForm, this.pointsComponent.element);
   }
 
   renderPoints(){
@@ -46,22 +46,21 @@ export default class PointsPresenter {
         offers: [...this.offersModel.getOffersById(this.pointsModels[i].type, this.pointsModels[i].offers)],
         destination: this.destinationModel.getDestinationById(this.pointsModels[i].destination)
       });
-      render(point, this.pointsComponent.getElement());
+      render(point, this.pointsComponent.element);
     }
   }
 
   renderCreationForm(){
     const creationForm = new CreationFormView({
       point: this.pointsModels.at(-1),
-      offersById: [...this.offersModel.getOffersById(this.pointsModels.at(-1).type, this.pointsModels.at(-1).offers)],
       offersByType: this.offersModel.getOffersByType(this.pointsModels.at(-1).type),
       destination: this.destinationModel.getDestinationById(this.pointsModels.at(-1).destination)
     });
-    render(creationForm, this.pointsComponent.getElement());
+    render(creationForm, this.pointsComponent.element);
   }
 
   init() {
-    this.pointsModels = [...this.pointsModel.getPoints()];
+    this.pointsModels = [...this.pointsModel.points];
 
     this.renderListFilter();
     this.renderListSort();

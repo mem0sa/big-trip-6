@@ -1,14 +1,14 @@
 import { mockOffers } from '../mock/offers';
 
 export default class OffersModel {
-  offers = mockOffers;
+  #offers = mockOffers;
 
-  getOffers() {
-    return this.offers;
+  get offers() {
+    return this.#offers;
   }
 
   getOffersByType(type) {
-    const allOffers = this.getOffers();
+    const allOffers = this.offers;
     return allOffers.find((item) => item.type === type);
   }
 
