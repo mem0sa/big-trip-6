@@ -4,7 +4,7 @@ import ListSortView from '../view/list-sort-view';
 import PointView from '../view/point-view';
 import RedactionFormView from '../view/redaction-form-view';
 import PointsContainerView from '../view/points-container-view';
-import {render} from '../framework/render';
+import { render, replace } from '../framework/render';
 
 export default class PointsPresenter {
   pointsComponent = new PointsContainerView();
@@ -39,15 +39,54 @@ export default class PointsPresenter {
     render(redactionForm, this.pointsComponent.element);
   }
 
-  renderPoints(){
-    for (let i = 1; i < this.pointsModels.length - 1; i++) {
-      const point = new PointView({
-        point: this.pointsModels[i],
-        offers: [...this.offersModel.getOffersById(this.pointsModels[i].type, this.pointsModels[i].offers)],
-        destination: this.destinationModel.getDestinationById(this.pointsModels[i].destination)
-      });
-      render(point, this.pointsComponent.element);
+  renderPoint(point, offers, offersByType, destination){
+    const escKeyDownHandler = (evt) => {
+      if(evt.key === 'Escape') {
+        evt.preventDefault();
+        replaceRedactionPointToPoint();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const onOpenRedactionButtonClick = () => {
+      replacePointToRedactionPoint();
+      document.addEventListener('keydown', escKeyDownHandler);
+    };
+
+    const onCloseRedactionButtonClick = () => {
+      replaceRedactionPointToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
+    };
+
+    const onSubmitButtonClick = () => {
+      replaceRedactionPointToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
+    };
+
+    const pointComponent = new PointView({
+      point,
+      offers,
+      destination,
+      onOpenRedactionButtonClick
+    });
+
+    const redactionPointComponent = new RedactionFormView({
+      point,
+      offersByType,
+      destination,
+      onCloseRedactionButtonClick,
+      onSubmitButtonClick
+    });
+
+    function replacePointToRedactionPoint() {
+      replace(redactionPointComponent, pointComponent);
     }
+
+    function replaceRedactionPointToPoint() {
+      replace(pointComponent, redactionPointComponent);
+    }
+
+    render(pointComponent, this.pointsComponent.element);
   }
 
   renderCreationForm(){
@@ -65,9 +104,14 @@ export default class PointsPresenter {
     this.renderListFilter();
     this.renderListSort();
     this.renderPointsContainer();
-    this.renderRedactionForm();
 
-    this.renderPoints();
+    for (let i = 1; i < this.pointsModels.length - 1; i++) {
+      this.renderPoint(
+        this.pointsModels[i],
+        [...this.offersModel.getOffersById(this.pointsModels[i].type, this.pointsModels[i].offers)],
+        this.offersModel.getOffersByType(this.pointsModels[i].type),
+        this.destinationModel.getDestinationById(this.pointsModels[i].destination));
+    }
 
     this.renderCreationForm();
   }
