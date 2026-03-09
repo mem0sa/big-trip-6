@@ -5,7 +5,7 @@ dayjs.extend(require('dayjs/plugin/duration'));
 const DATE_FORMAT = 'MMM D';
 const DATE_FORMAT_TIME = 'HH:mm';
 const DATE_FORMAT_DIFF = 'DD [D] HH [H] mm [M]';
-const DATE_FORMAT_DATE_TIME = 'DD/MM/YY HH:MM'
+const DATE_FORMAT_DATE_TIME = 'DD/MM/YY HH:MM';
 
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
