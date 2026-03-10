@@ -32,4 +32,23 @@ function humanizeTaskDueDateTime(date) {
   return dateJs.format(DATE_FORMAT_DATE_TIME);
 }
 
-export {getRandomArrayElement, humanizeTaskDueDate, humanizeTaskDueTime, humanizeTaskDueDateTime, dateDiff};
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const isFuturePoint = (point) => dayjs().isBefore(point.dateFrom, 'minute');
+
+const isExpiredPoint = (point) => dayjs(point.dateTo) && dayjs().isAfter(dayjs(point.dateTo), 'milliseconds');
+
+const isActualPoint = (point) => point.dateTo && (dayjs().isSame(dayjs(point.dateFrom), 'minute') || dayjs().isAfter(dayjs(point.dateFrom), 'minute') && dayjs().isBefore(dayjs(point.dateTo), 'minute'));
+
+export {
+  capitalizeFirstLetter,
+  getRandomArrayElement,
+  humanizeTaskDueDate,
+  humanizeTaskDueTime,
+  humanizeTaskDueDateTime,
+  dateDiff,
+  isActualPoint,
+  isFuturePoint,
+  isExpiredPoint};
