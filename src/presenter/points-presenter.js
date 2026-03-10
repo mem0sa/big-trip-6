@@ -4,7 +4,10 @@ import ListSortView from '../view/list-sort-view';
 import PointView from '../view/point-view';
 import RedactionFormView from '../view/redaction-form-view';
 import PointsContainerView from '../view/points-container-view';
+import ListMessageView from '../view/list-message';
+import { generateFilters } from '../mock/filter';
 import { render, replace } from '../framework/render';
+import { EMPTY_LIST_MESSAGE } from '../const';
 
 export default class PointsPresenter {
   pointsComponent = new PointsContainerView();
@@ -17,8 +20,9 @@ export default class PointsPresenter {
     this.offersModel = offersModel;
   }
 
-  renderListFilter(){
-    render(new ListFilterView(), this.filterContainer);
+  renderListFilter(pointsModel){
+    const filters = generateFilters(pointsModel);
+    render(new ListFilterView({filters}), this.filterContainer);
   }
 
   renderListSort(){
@@ -29,14 +33,8 @@ export default class PointsPresenter {
     render(this.pointsComponent, this.pointsContainer);
   }
 
-  renderRedactionForm(){
-    const redactionForm = new RedactionFormView({
-      point: this.pointsModels[0],
-      offersById: [...this.offersModel.getOffersById(this.pointsModels[0].type, this.pointsModels[0].offers)],
-      offersByType: this.offersModel.getOffersByType(this.pointsModels[0].type),
-      destination: this.destinationModel.getDestinationById(this.pointsModels[0].destination)
-    });
-    render(redactionForm, this.pointsComponent.element);
+  renderListMessage(){
+    render(new ListMessageView({message: EMPTY_LIST_MESSAGE}), this.pointsContainer);
   }
 
   renderPoint(point, offers, offersByType, destination){
@@ -101,9 +99,13 @@ export default class PointsPresenter {
   init() {
     this.pointsModels = [...this.pointsModel.points];
 
-    this.renderListFilter();
+    this.renderListFilter(this.pointsModels);
     this.renderListSort();
     this.renderPointsContainer();
+
+    if (this.pointsModels.length === 0){
+      this.renderListMessage();
+    }
 
     for (let i = 1; i < this.pointsModels.length - 1; i++) {
       this.renderPoint(

@@ -1,6 +1,6 @@
 import { mockPoints } from '../mock/point';
 
-const POINTS_AMOUNT = 6;
+const POINTS_AMOUNT = 10;
 export default class PointsModel {
   #points = mockPoints;
 
