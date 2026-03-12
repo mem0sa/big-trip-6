@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
-import {dateDiff, humanizeTaskDueDate, humanizeTaskDueTime} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view';
+import { dateDiff, humanizeTaskDueDate, humanizeTaskDueTime } from '../utils.js';
 
 function createPointTemplate(point, offers, destination) {
   const { basePrice, dateFrom, dateTo, isFavorite, type} = point;
@@ -57,26 +57,34 @@ function createPointTemplate(point, offers, destination) {
   );
 }
 
-export default class PointView {
-  constructor({point, offers, destination}) {
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
+export default class PointView extends AbstractView{
+
+  #point = null;
+  #offers = null;
+  #destination = null;
+  #onOpenRedactionButtonClick = null;
+
+  constructor({point, offers, destination, onOpenRedactionButtonClick}) {
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#onOpenRedactionButtonClick = onOpenRedactionButtonClick;
+    this.#setEventListeners();
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+  #setEventListeners() {
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#openRedactionButtonClickHandler);
   }
 
-  removeElement() {
-    this.element = null;
-  }
+  #openRedactionButtonClickHandler = (evt) => {
+    evt.preventDefault(evt);
+    this.#onOpenRedactionButtonClick();
+  };
 }

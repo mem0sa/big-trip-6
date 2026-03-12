@@ -4,7 +4,10 @@ import ListSortView from '../view/list-sort-view';
 import PointView from '../view/point-view';
 import RedactionFormView from '../view/redaction-form-view';
 import PointsContainerView from '../view/points-container-view';
-import {render} from '../render';
+import ListMessageView from '../view/list-message';
+import { generateFilters } from '../mock/filter';
+import { render, replace } from '../framework/render';
+import { EMPTY_LIST_MESSAGE } from '../const';
 
 export default class PointsPresenter {
   pointsComponent = new PointsContainerView();
@@ -17,8 +20,9 @@ export default class PointsPresenter {
     this.offersModel = offersModel;
   }
 
-  renderListFilter(){
-    render(new ListFilterView(), this.filterContainer);
+  renderListFilter(pointsModel){
+    const filters = generateFilters(pointsModel);
+    render(new ListFilterView({filters}), this.filterContainer);
   }
 
   renderListSort(){
@@ -29,46 +33,87 @@ export default class PointsPresenter {
     render(this.pointsComponent, this.pointsContainer);
   }
 
-  renderRedactionForm(){
-    const redactionForm = new RedactionFormView({
-      point: this.pointsModels[0],
-      offersById: [...this.offersModel.getOffersById(this.pointsModels[0].type, this.pointsModels[0].offers)],
-      offersByType: this.offersModel.getOffersByType(this.pointsModels[0].type),
-      destination: this.destinationModel.getDestinationById(this.pointsModels[0].destination)
-    });
-    render(redactionForm, this.pointsComponent.getElement());
+  renderListMessage(){
+    render(new ListMessageView({message: EMPTY_LIST_MESSAGE}), this.pointsContainer);
   }
 
-  renderPoints(){
-    for (let i = 1; i < this.pointsModels.length - 1; i++) {
-      const point = new PointView({
-        point: this.pointsModels[i],
-        offers: [...this.offersModel.getOffersById(this.pointsModels[i].type, this.pointsModels[i].offers)],
-        destination: this.destinationModel.getDestinationById(this.pointsModels[i].destination)
-      });
-      render(point, this.pointsComponent.getElement());
+  renderPoint(point, offers, offersByType, destination){
+    const escKeyDownHandler = (evt) => {
+      if(evt.key === 'Escape') {
+        evt.preventDefault();
+        replaceRedactionPointToPoint();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const onOpenRedactionButtonClick = () => {
+      replacePointToRedactionPoint();
+      document.addEventListener('keydown', escKeyDownHandler);
+    };
+
+    const onCloseRedactionButtonClick = () => {
+      replaceRedactionPointToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
+    };
+
+    const onSubmitButtonClick = () => {
+      replaceRedactionPointToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
+    };
+
+    const pointComponent = new PointView({
+      point,
+      offers,
+      destination,
+      onOpenRedactionButtonClick
+    });
+
+    const redactionPointComponent = new RedactionFormView({
+      point,
+      offersByType,
+      destination,
+      onCloseRedactionButtonClick,
+      onSubmitButtonClick
+    });
+
+    function replacePointToRedactionPoint() {
+      replace(redactionPointComponent, pointComponent);
     }
+
+    function replaceRedactionPointToPoint() {
+      replace(pointComponent, redactionPointComponent);
+    }
+
+    render(pointComponent, this.pointsComponent.element);
   }
 
   renderCreationForm(){
     const creationForm = new CreationFormView({
       point: this.pointsModels.at(-1),
-      offersById: [...this.offersModel.getOffersById(this.pointsModels.at(-1).type, this.pointsModels.at(-1).offers)],
       offersByType: this.offersModel.getOffersByType(this.pointsModels.at(-1).type),
       destination: this.destinationModel.getDestinationById(this.pointsModels.at(-1).destination)
     });
-    render(creationForm, this.pointsComponent.getElement());
+    render(creationForm, this.pointsComponent.element);
   }
 
   init() {
-    this.pointsModels = [...this.pointsModel.getPoints()];
+    this.pointsModels = [...this.pointsModel.points];
 
-    this.renderListFilter();
+    this.renderListFilter(this.pointsModels);
     this.renderListSort();
     this.renderPointsContainer();
-    this.renderRedactionForm();
 
-    this.renderPoints();
+    if (this.pointsModels.length === 0){
+      this.renderListMessage();
+    }
+
+    for (let i = 1; i < this.pointsModels.length - 1; i++) {
+      this.renderPoint(
+        this.pointsModels[i],
+        [...this.offersModel.getOffersById(this.pointsModels[i].type, this.pointsModels[i].offers)],
+        this.offersModel.getOffersByType(this.pointsModels[i].type),
+        this.destinationModel.getDestinationById(this.pointsModels[i].destination));
+    }
 
     this.renderCreationForm();
   }

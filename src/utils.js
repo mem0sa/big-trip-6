@@ -5,7 +5,7 @@ dayjs.extend(require('dayjs/plugin/duration'));
 const DATE_FORMAT = 'MMM D';
 const DATE_FORMAT_TIME = 'HH:mm';
 const DATE_FORMAT_DIFF = 'DD [D] HH [H] mm [M]';
-const DATE_FORMAT_DATE_TIME = 'DD/MM/YY HH:MM'
+const DATE_FORMAT_DATE_TIME = 'DD/MM/YY HH:MM';
 
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
@@ -32,4 +32,23 @@ function humanizeTaskDueDateTime(date) {
   return dateJs.format(DATE_FORMAT_DATE_TIME);
 }
 
-export {getRandomArrayElement, humanizeTaskDueDate, humanizeTaskDueTime, humanizeTaskDueDateTime, dateDiff};
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const isFuturePoint = (point) => dayjs().isBefore(point.dateFrom, 'minute');
+
+const isExpiredPoint = (point) => dayjs(point.dateTo) && dayjs().isAfter(dayjs(point.dateTo), 'milliseconds');
+
+const isActualPoint = (point) => point.dateTo && (dayjs().isSame(dayjs(point.dateFrom), 'minute') || dayjs().isAfter(dayjs(point.dateFrom), 'minute') && dayjs().isBefore(dayjs(point.dateTo), 'minute'));
+
+export {
+  capitalizeFirstLetter,
+  getRandomArrayElement,
+  humanizeTaskDueDate,
+  humanizeTaskDueTime,
+  humanizeTaskDueDateTime,
+  dateDiff,
+  isActualPoint,
+  isFuturePoint,
+  isExpiredPoint};

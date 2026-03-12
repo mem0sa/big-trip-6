@@ -1,7 +1,7 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { humanizeTaskDueDateTime } from '../utils.js';
 
-function createCreationFormTemplate(point, offersById, offersByType, destination) {
+function createCreationFormTemplate(point, offersByType, destination) {
   const {dateFrom, dateTo, type} = point;
 
   const typeName = type[0].toUpperCase() + type.slice(1, type.length);
@@ -160,27 +160,21 @@ function createCreationFormTemplate(point, offersById, offersByType, destination
   );
 }
 
-export default class CreationFormView {
-  constructor({point, offersById, offersByType, destination}) {
-    this.point = point;
-    this.offersById = offersById;
-    this.offersByType = offersByType;
-    this.destination = destination;
+export default class CreationFormView extends AbstractView{
+
+  #point = null;
+  #offersById = null;
+  #offersByType = null;
+  #destination = null;
+
+  constructor({point, offersByType, destination}) {
+    super();
+    this.#point = point;
+    this.#offersByType = offersByType;
+    this.#destination = destination;
   }
 
-  getTemplate() {
-    return createCreationFormTemplate(this.point, this.offersById, this.offersByType, this.destination);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createCreationFormTemplate(this.#point, this.#offersByType, this.#destination);
   }
 }

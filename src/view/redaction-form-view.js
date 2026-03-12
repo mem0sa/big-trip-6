@@ -1,7 +1,7 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { humanizeTaskDueDateTime } from '../utils.js';
 
-function createRedactionFormTemplate(point, offersById, offersByType, destination) {
+function createRedactionFormTemplate(point, offersByType, destination) {
   const { basePrice, dateFrom, dateTo, type} = point;
 
   const typeName = type[0].toUpperCase() + type.slice(1, type.length);
@@ -150,27 +150,45 @@ function createRedactionFormTemplate(point, offersById, offersByType, destinatio
   );
 }
 
-export default class RedactionFormView {
-  constructor({point, offersById, offersByType, destination}) {
-    this.point = point;
-    this.offersById = offersById;
-    this.offersByType = offersByType;
-    this.destination = destination;
+export default class RedactionFormView extends AbstractView{
+
+  #point = null;
+  #offersByType = null;
+  #destination = null;
+  #onCloseRedactionButtonClick = null;
+  #onSubmitButtonClick = null;
+
+  constructor({point, offersByType, destination, onCloseRedactionButtonClick, onSubmitButtonClick}) {
+    super();
+    this.#point = point;
+    this.#offersByType = offersByType;
+    this.#destination = destination;
+    this.#onCloseRedactionButtonClick = onCloseRedactionButtonClick;
+    this.#onSubmitButtonClick = onSubmitButtonClick;
+    this.#setEventListeners();
   }
 
-  getTemplate() {
-    return createRedactionFormTemplate(this.point, this.offersById, this.offersByType, this.destination);
+  get template() {
+    return createRedactionFormTemplate(this.#point, this.#offersByType, this.#destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #setEventListeners() {
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#closeRedactionButtonClickHandler);
 
-    return this.element;
+    this.element
+      .querySelector('.event__save-btn')
+      .addEventListener('submit', this.#submitButtonClickHandler);
   }
 
-  removeElement() {
-    this.element = null;
-  }
+  #closeRedactionButtonClickHandler = (evt) => {
+    evt.preventDefault(evt);
+    this.#onCloseRedactionButtonClick();
+  };
+
+  #submitButtonClickHandler = (evt) => {
+    evt.preventDefault(evt);
+    this.#onSubmitButtonClick();
+  };
 }

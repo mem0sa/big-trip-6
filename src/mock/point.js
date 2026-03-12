@@ -17,7 +17,7 @@ const mockPoints = [
     'id': 'ae53d4f7-4723-4e1b-b47b-43804acad48e',
     'basePrice': 6736,
     'dateFrom': '2026-02-17T20:35:04.639Z',
-    'dateTo': '2026-02-19T20:59:04.639Z',
+    'dateTo': '2030-02-19T20:59:04.639Z',
     'destination': '75665944-f952-4280-bfcb-17e4965cde94',
     'isFavorite': true,
     'offers': [
@@ -30,8 +30,8 @@ const mockPoints = [
   {
     'id': '59001ce5-df2d-40f2-bc01-ecb0e0d14d29',
     'basePrice': 369,
-    'dateFrom': '2026-02-20T15:40:04.639Z',
-    'dateTo': '2026-02-21T20:10:04.639Z',
+    'dateFrom': '2030-02-20T15:40:04.639Z',
+    'dateTo': '2030-02-21T20:10:04.639Z',
     'destination': '65a2ab11-b785-423a-85d2-69b91aa4eee9',
     'isFavorite': false,
     'offers': [
